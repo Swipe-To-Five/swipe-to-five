@@ -1,3 +1,4 @@
+import { RefreshToken } from './../models/refresh_token.model';
 import { AccessToken } from './../models/access_token.model';
 import { Logger } from '@nestjs/common';
 import { Sequelize } from 'sequelize-typescript';
@@ -20,7 +21,7 @@ export const databaseProviders = [
         database: process.env.DATABASE_NAME,
         logging: (...message) => databaseLogger.debug(message),
       });
-      sequelize.addModels([Account, AccessToken]);
+      sequelize.addModels([Account, AccessToken, RefreshToken]);
       await sequelize.sync();
 
       databaseLogger.log('Successfully connected to the database');

@@ -1,3 +1,4 @@
+import { RefreshToken } from './refresh_token.model';
 import {
   BelongsTo,
   Column,
@@ -6,6 +7,7 @@ import {
   Model,
   PrimaryKey,
   Table,
+  HasOne,
 } from 'sequelize-typescript';
 import { Account } from './account.model';
 
@@ -23,6 +25,9 @@ export class AccessToken extends Model<AccessToken> {
 
   @BelongsTo(() => Account)
   public account: Account;
+
+  @HasOne(() => RefreshToken)
+  public refreshToken: RefreshToken;
 
   @ForeignKey(() => Account)
   @Column({ type: DataType.UUID })
