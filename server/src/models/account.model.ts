@@ -1,3 +1,4 @@
+import { CreateAccountDto } from './../dto/auth/create-account.dto';
 import { AccessToken } from './access_token.model';
 import {
   Column,
@@ -7,6 +8,7 @@ import {
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
+import * as bcrypt from 'bcrypt';
 
 @Table({ tableName: 'accounts' })
 export class Account extends Model<Account> {
@@ -22,4 +24,15 @@ export class Account extends Model<Account> {
 
   @HasMany(() => AccessToken)
   public accessTokens: AccessToken[];
+
+  public static async fromDto(
+    createAccountDto: CreateAccountDto,
+  ): Promise<Account> {
+    const account = new Account();
+
+    account.emailAddress = createAccountDto.emailAddress;
+    account.password = await bcrypt.hash(createAccountDto.password, 12);
+
+    return account;
+  }
 }
