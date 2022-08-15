@@ -1,0 +1,3 @@
+export enum AccountError {
+  ACCOUNT_ALREADY_EXISTS = 'ACCOUNT_ALREADY_EXISTS',
+}
