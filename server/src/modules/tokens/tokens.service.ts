@@ -114,6 +114,12 @@ export class TokensService {
     });
   }
 
+  public async getRefreshToken(
+    options: FindOptions<RefreshToken>,
+  ): Promise<RefreshToken | null> {
+    return await this.refreshTokenRepository.findOne(options);
+  }
+
   public async createRefreshToken(
     accessToken: AccessToken,
     expiresIn: number,

@@ -114,6 +114,19 @@ describe('TokensService', () => {
     expect(createSpy).toBeCalledTimes(1);
   });
 
+  it('should fetch refresh token', async () => {
+    const findSpy = jest.spyOn(refreshTokenModel, 'findOne');
+
+    const mockResult = await service.getRefreshToken({
+      where: {
+        token: testRefreshToken.token,
+      },
+    });
+
+    expect(mockResult).toEqual(testRefreshToken);
+    expect(findSpy).toBeCalledTimes(1);
+  });
+
   it('should create new refresh token', async () => {
     const createSpy = jest.spyOn(refreshTokenModel, 'create');
 
