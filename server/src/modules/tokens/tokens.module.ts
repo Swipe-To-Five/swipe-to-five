@@ -1,3 +1,4 @@
+import { Account } from './../../models/account.model';
 import { RefreshToken } from './../../models/refresh_token.model';
 import { AccessToken } from './../../models/access_token.model';
 import { SequelizeModule } from '@nestjs/sequelize';
@@ -8,7 +9,7 @@ import { TokensService } from './tokens.service';
 @Global()
 @Module({
   imports: [
-    SequelizeModule.forFeature([AccessToken, RefreshToken]),
+    SequelizeModule.forFeature([AccessToken, RefreshToken, Account]),
     JwtModule.register({
       secret: '<SECRET KEY>',
       signOptions: {

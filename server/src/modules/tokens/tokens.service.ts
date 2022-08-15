@@ -20,6 +20,9 @@ export interface RefreshTokenPayload {
 @Injectable()
 export class TokensService {
   constructor(
+    @InjectModel(Account)
+    private readonly accountRepository: typeof Account,
+
     @InjectModel(AccessToken)
     private readonly accessTokenRepository: typeof AccessToken,
 
@@ -47,5 +50,35 @@ export class TokensService {
       token: accessToken,
       platform,
     });
+  }
+
+  public async createRefreshToken(
+    accessToken: AccessToken,
+    expiresIn: number,
+  ): Promise<RefreshToken> {
+    const accessTokenModel = await this.accessTokenRepository.findOne({
+      where: {
+        id: accessToken.id,
+      },
+      include: [this.accountRepository],
+    });
+
+    const dummyRefreshToken = await this.refreshTokenRepository.create({
+      token: 'dummy',
+      accessToken: accessTokenModel,
+    });
+
+    const options: SignOptions = {
+      ...BASE_OPTIONS,
+      expiresIn,
+      subject: String(accessTokenModel.account.id),
+      jwtid: dummyRefreshToken.id,
+    };
+
+    const refreshToken = await this.jwtService.signAsync({}, options);
+
+    dummyRefreshToken.token = refreshToken;
+
+    return await dummyRefreshToken.save();
   }
 }

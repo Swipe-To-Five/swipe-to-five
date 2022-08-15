@@ -7,27 +7,31 @@ import { TokensService } from './tokens.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AccountService } from '../account/account.service';
 
-const testAccessToken = {
-  id: 'id',
-  token: 'token',
-  platform: 'platform',
-};
-
-const testRefreshToken = {
-  id: 'id',
-  token: 'token',
-  platform: 'platform',
-};
-
 const testAccount = {
   id: 'id',
   emailAddress: 'example@example.com',
   password: 'example',
 };
 
+const testAccessToken = {
+  id: 'id',
+  token: 'token',
+  platform: 'platform',
+  account: testAccount,
+};
+
+const testRefreshToken = {
+  id: 'id',
+  token: 'token',
+  platform: 'platform',
+  accessToken: testAccessToken,
+  save: jest.fn(() => testRefreshToken),
+};
+
 describe('TokensService', () => {
   let service: TokensService;
   let accessTokenModel: typeof AccessToken;
+  let refreshTokenModel: typeof RefreshToken;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -76,6 +80,9 @@ describe('TokensService', () => {
     accessTokenModel = module.get<typeof AccessToken>(
       getModelToken(AccessToken),
     );
+    refreshTokenModel = module.get<typeof RefreshToken>(
+      getModelToken(RefreshToken),
+    );
   });
 
   it('should be defined', () => {
@@ -91,6 +98,18 @@ describe('TokensService', () => {
     );
 
     expect(mockResult).toEqual(testAccessToken);
+    expect(createSpy).toBeCalledTimes(1);
+  });
+
+  it('should create new refresh token', async () => {
+    const createSpy = jest.spyOn(refreshTokenModel, 'create');
+
+    const mockResult = await service.createRefreshToken(
+      testAccessToken as AccessToken,
+      100,
+    );
+
+    expect(mockResult).toEqual(testRefreshToken);
     expect(createSpy).toBeCalledTimes(1);
   });
 });
