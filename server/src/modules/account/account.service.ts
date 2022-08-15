@@ -1,5 +1,4 @@
-import { AccountRepository } from './../../constants/repository.constant';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Account } from '../../models/account.model';
 import { CreateOptions, FindOptions, Optional } from 'sequelize/types';
 import { NullishPropertiesOf } from 'sequelize/types/utils';
