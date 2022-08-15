@@ -1,54 +1,72 @@
-import { RefreshToken } from './../../models/refresh_token.model';
-import { AccessToken } from './../../models/access_token.model';
-import { createMockDatabase } from '../../mock/database.mock';
-import { Sequelize } from 'sequelize-typescript';
 import { AccountService } from './account.service';
 import { Account } from '../../models/account.model';
+import { Test } from '@nestjs/testing';
+import { getModelToken } from '@nestjs/sequelize';
+
+const testAccount = {
+  id: 'id',
+  emailAddress: 'example@example.com',
+  password: 'example',
+};
 
 describe('AccountService', () => {
   let service: AccountService;
-  let database: Sequelize;
+  let model: typeof Account;
 
-  beforeAll(async () => {
-    database = await createMockDatabase([Account, AccessToken, RefreshToken]);
+  beforeEach(async () => {
+    const testingModule = await Test.createTestingModule({
+      providers: [
+        {
+          provide: getModelToken(Account),
+          useValue: {
+            findAll: jest.fn(() => [testAccount]),
+            findOne: jest.fn(() => testAccount),
+            create: jest.fn(() => testAccount),
+            remove: jest.fn(),
+          },
+        },
+        AccountService,
+      ],
+    }).compile();
 
-    service = new AccountService(Account);
+    service = testingModule.get<AccountService>(AccountService);
+    model = testingModule.get<typeof Account>(getModelToken(Account));
   });
-
-  afterAll(() => database.close());
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    beforeAll(async () => {
-      await Account.create({
+  it('should get an account', () => {
+    const findSpy = jest.spyOn(model, 'findOne');
+
+    expect(
+      service.getAccount({
+        where: {
+          emailAddress: 'example@example.com',
+        },
+      }),
+    );
+
+    expect(findSpy).toBeCalledWith({
+      where: {
+        emailAddress: 'example@example.com',
+      },
+    });
+
+    expect(findSpy).toBeCalledTimes(1);
+  });
+
+  it('should create an account', async () => {
+    const createSpy = jest.spyOn(model, 'create');
+
+    expect(
+      await service.createAccount({
         emailAddress: 'example@example.com',
         password: 'example',
-      });
-    });
+      }),
+    ).toEqual(testAccount);
 
-    afterAll(async () => {
-      await Account.truncate();
-    });
-
-    it('should create new account', async () => {
-      expect(
-        await service.createAccount({
-          emailAddress: 'example1@example.com',
-          password: 'password',
-        }),
-      ).resolves;
-    });
-
-    it('should throw error', async () => {
-      expect(
-        service.createAccount({
-          emailAddress: 'example@example.com',
-          password: 'password',
-        }),
-      ).rejects.toThrow();
-    });
+    expect(createSpy).toBeCalledTimes(1);
   });
 });
