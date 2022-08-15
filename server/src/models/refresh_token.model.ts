@@ -18,6 +18,9 @@ export class RefreshToken extends Model<RefreshToken> {
   @Column({ unique: true, type: DataType.TEXT })
   public token: string;
 
+  @Column({ defaultValue: false })
+  public isRevoked: boolean;
+
   @BelongsTo(() => AccessToken)
   public accessToken: AccessToken;
 

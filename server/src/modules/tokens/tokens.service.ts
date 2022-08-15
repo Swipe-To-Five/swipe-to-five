@@ -1,7 +1,8 @@
+import { TokensError } from './../../enum/tokens/tokens-error.enum';
 import { Account } from './../../models/account.model';
 import { RefreshToken } from './../../models/refresh_token.model';
 import { AccessToken } from './../../models/access_token.model';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { JwtService } from '@nestjs/jwt';
 import { AccountService } from '../account/account.service';
@@ -33,6 +34,60 @@ export class TokensService {
 
     private readonly accountService: AccountService,
   ) {}
+
+  private async decodeRefreshToken(
+    token: string,
+  ): Promise<RefreshTokenPayload> {
+    try {
+      return this.jwtService.verifyAsync(token);
+    } catch (e) {
+      if (e instanceof TokenExpiredError) {
+        throw new UnprocessableEntityException({
+          error: TokensError.REFRESH_TOKEN_EXPIRED,
+        });
+      } else {
+        throw new UnprocessableEntityException({
+          error: TokensError.REFRESH_TOKEN_MALFORMED,
+        });
+      }
+    }
+  }
+
+  private async getStoredTokenFromRefreshTokenPayload(
+    payload: RefreshTokenPayload,
+  ): Promise<RefreshToken | null> {
+    const tokenId = payload.jti;
+
+    if (!tokenId) {
+      throw new UnprocessableEntityException({
+        error: TokensError.REFRESH_TOKEN_MALFORMED,
+      });
+    }
+
+    return await this.refreshTokenRepository.findOne({
+      where: {
+        id: tokenId,
+      },
+    });
+  }
+
+  private async getUserFromRefreshTokenPayload(
+    payload: RefreshTokenPayload,
+  ): Promise<Account> {
+    const subId = payload.sub;
+
+    if (!subId) {
+      throw new UnprocessableEntityException({
+        error: TokensError.REFRESH_TOKEN_MALFORMED,
+      });
+    }
+
+    return this.accountService.getAccount({
+      where: {
+        id: subId,
+      },
+    });
+  }
 
   public async createAccessToken(
     account: Account,
@@ -80,5 +135,35 @@ export class TokensService {
     dummyRefreshToken.token = refreshToken;
 
     return await dummyRefreshToken.save();
+  }
+
+  public async resolveRefreshToken(
+    encodedToken: string,
+  ): Promise<{ account: Account; token: RefreshToken }> {
+    const payload = await this.decodeRefreshToken(encodedToken);
+
+    const token = await this.getStoredTokenFromRefreshTokenPayload(payload);
+
+    if (!token) {
+      throw new UnprocessableEntityException({
+        error: TokensError.REFRESH_TOKEN_NOT_FOUND,
+      });
+    }
+
+    if (token.isRevoked) {
+      throw new UnprocessableEntityException({
+        error: TokensError.REFRESH_TOKEN_REVOKED,
+      });
+    }
+
+    const account = await this.getUserFromRefreshTokenPayload(payload);
+
+    if (!account) {
+      throw new UnprocessableEntityException({
+        error: TokensError.REFRESH_TOKEN_MALFORMED,
+      });
+    }
+
+    return { account, token };
   }
 }

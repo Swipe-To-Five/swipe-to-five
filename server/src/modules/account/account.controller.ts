@@ -2,7 +2,7 @@ import { CreateAccountDto } from './../../dto/auth/create-account.dto';
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import { AccountService } from './account.service';
 import * as bcrypt from 'bcrypt';
-import { AccountError } from '../../enum/account/account-error.constant';
+import { AccountError } from '../../enum/account/account-error.enum';
 
 @Controller('account')
 export class AccountController {
