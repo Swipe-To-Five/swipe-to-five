@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { JwtService } from '@nestjs/jwt';
 import { AccountService } from '../account/account.service';
 import { SignOptions, TokenExpiredError } from 'jsonwebtoken';
+import { FindOptions } from 'sequelize/types';
 
 const BASE_OPTIONS: SignOptions = {
   issuer: 'https://my-app.com',
@@ -87,6 +88,12 @@ export class TokensService {
         id: subId,
       },
     });
+  }
+
+  public async getAccessToken(
+    options: FindOptions<AccessToken>,
+  ): Promise<AccessToken | null> {
+    return await this.accessTokenRepository.findOne(options);
   }
 
   public async createAccessToken(

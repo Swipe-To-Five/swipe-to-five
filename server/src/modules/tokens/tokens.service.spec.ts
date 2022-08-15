@@ -89,6 +89,19 @@ describe('TokensService', () => {
     expect(service).toBeDefined();
   });
 
+  it('should fetch access token', async () => {
+    const findSpy = jest.spyOn(accessTokenModel, 'findOne');
+
+    const mockResult = await service.getAccessToken({
+      where: {
+        token: testAccessToken.token,
+      },
+    });
+
+    expect(mockResult).toEqual(testAccessToken);
+    expect(findSpy).toBeCalledTimes(1);
+  });
+
   it('should create new access token', async () => {
     const createSpy = jest.spyOn(accessTokenModel, 'create');
 
