@@ -1,3 +1,4 @@
+import { TokensModule } from './modules/tokens/tokens.module';
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AccessToken } from './models/access_token.model';
@@ -16,6 +17,7 @@ import { AccountModule } from './modules/account/account.module';
       models: [Account, AccessToken, RefreshToken],
     }),
     AccountModule,
+    TokensModule,
   ],
 })
 export class AppModule {}
