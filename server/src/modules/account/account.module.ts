@@ -1,9 +1,10 @@
 import { Account } from './../../models/account.model';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { AccountController } from './account.controller';
 
+@Global()
 @Module({
   imports: [SequelizeModule.forFeature([Account])],
   providers: [AccountService],
