@@ -1,8 +1,18 @@
+import { Account } from './../../models/account.model';
+import { JwtGuard } from './../../guards/jwt.guard';
 import { CreateAccountDto } from './../../dto/auth/create-account.dto';
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AccountService } from './account.service';
 import * as bcrypt from 'bcrypt';
 import { AccountError } from '../../enum/account/account-error.enum';
+import { LoggedInAccount } from './../../decorators/logged-in-account.decorator';
 
 @Controller('v1/account')
 export class AccountController {
@@ -27,5 +37,11 @@ export class AccountController {
         password: hashedPassword,
       });
     }
+  }
+
+  @Get()
+  @UseGuards(JwtGuard)
+  public getAccount(@LoggedInAccount() account: Account): Account {
+    return account;
   }
 }
