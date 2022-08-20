@@ -21,6 +21,7 @@ const testAccessToken = {
   token: 'token',
   platform: 'platform',
   account: testAccount,
+  save: jest.fn(() => testAccessToken),
 };
 
 const testRefreshToken = {
@@ -96,6 +97,16 @@ describe('AuthController', () => {
       emailAddress: testAccount.emailAddress,
       password: testAccount.password,
       platform: 'example',
+    });
+
+    expect(serviceSpy).toBeCalledTimes(1);
+  });
+
+  it('should refresh all tokens', async () => {
+    const serviceSpy = jest.spyOn(service, 'refreshAllTokens');
+
+    await controller.refreshAllTokens({
+      refreshToken: testRefreshToken.token,
     });
 
     expect(serviceSpy).toBeCalledTimes(1);
