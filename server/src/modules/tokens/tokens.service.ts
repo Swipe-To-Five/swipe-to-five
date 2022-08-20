@@ -65,7 +65,7 @@ export class TokensService {
       });
     }
 
-    return await this.refreshTokenRepository.findOne({
+    return await this.getRefreshToken({
       where: {
         id: tokenId,
       },
@@ -93,6 +93,7 @@ export class TokensService {
   public async getAccessToken(
     options: FindOptions<AccessToken>,
   ): Promise<AccessToken | null> {
+    options.include = [this.accountRepository, this.refreshTokenRepository];
     return await this.accessTokenRepository.findOne(options);
   }
 
@@ -118,6 +119,7 @@ export class TokensService {
   public async getRefreshToken(
     options: FindOptions<RefreshToken>,
   ): Promise<RefreshToken | null> {
+    options.include = [this.accessTokenRepository];
     return await this.refreshTokenRepository.findOne(options);
   }
 
@@ -180,5 +182,53 @@ export class TokensService {
     }
 
     return { account, token };
+  }
+
+  public async refreshAccessToken(
+    accessToken: AccessToken,
+  ): Promise<AccessToken> {
+    const accessTokenModel = await this.accessTokenRepository.findOne({
+      where: {
+        id: accessToken.id,
+      },
+      include: [this.accountRepository],
+    });
+
+    const options: SignOptions = {
+      ...BASE_OPTIONS,
+      subject: String(accessTokenModel.accountId),
+    };
+
+    const newAccessToken = await this.jwtService.signAsync({}, options);
+
+    accessToken.token = newAccessToken;
+
+    return await accessToken.save();
+  }
+
+  public async refreshRefreshToken(
+    refreshToken: RefreshToken,
+    accessToken: AccessToken,
+    expiresIn: number,
+  ): Promise<RefreshToken> {
+    const accessTokenModel = await this.accessTokenRepository.findOne({
+      where: {
+        id: accessToken.id,
+      },
+      include: [this.accountRepository],
+    });
+
+    const options: SignOptions = {
+      ...BASE_OPTIONS,
+      expiresIn,
+      subject: String(accessTokenModel.account.id),
+      jwtid: String(refreshToken.id),
+    };
+
+    const newRefreshToken = await this.jwtService.signAsync({}, options);
+
+    refreshToken.token = newRefreshToken;
+
+    return await refreshToken.save();
   }
 }

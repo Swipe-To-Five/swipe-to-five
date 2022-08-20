@@ -20,6 +20,7 @@ const testAccessToken = {
   token: 'token',
   platform: 'platform',
   account: testAccount,
+  save: jest.fn(() => testAccessToken),
 };
 
 const testRefreshToken = {
@@ -103,5 +104,22 @@ describe('AuthService', () => {
     expect(accountSpy).toBeCalledTimes(1);
     expect(accessTokenSpy).toBeCalledTimes(1);
     expect(refreshTokenSpy).toBeCalledTimes(1);
+  });
+
+  it('should refresh all tokens', async () => {
+    const resolveRefreshTokenSpy = jest.spyOn(
+      tokensService,
+      'resolveRefreshToken',
+    );
+    const newAccessTokenSpy = jest.spyOn(tokensService, 'refreshAccessToken');
+    const newRefreshTokenSpy = jest.spyOn(tokensService, 'refreshRefreshToken');
+
+    await service.refreshAllTokens({
+      refreshToken: testRefreshToken.token,
+    });
+
+    expect(resolveRefreshTokenSpy).toBeCalledTimes(1);
+    expect(newAccessTokenSpy).toBeCalledTimes(1);
+    expect(newRefreshTokenSpy).toBeCalledTimes(1);
   });
 });

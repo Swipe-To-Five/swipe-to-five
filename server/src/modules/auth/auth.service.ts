@@ -1,3 +1,4 @@
+import { RefreshTokenDto } from './../../dto/auth/refresh-token.dto';
 import { getOneMonthLater } from './../../utils/time.util';
 import { AuthError } from './../../enum/auth/auth-error.enum';
 import { Account } from './../../models/account.model';
@@ -68,5 +69,27 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const account = await this.validateAndFetchAccount(loginAccountDto);
     return await this.generateTokensForLogin(account, loginAccountDto.platform);
+  }
+
+  public async refreshAllTokens(
+    refreshTokenDto: RefreshTokenDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const { account, token: refreshToken } =
+      await this.tokenService.resolveRefreshToken(refreshTokenDto.refreshToken);
+
+    const newAccessToken = await this.tokenService.refreshAccessToken(
+      refreshToken.accessToken,
+    );
+
+    const newRefreshToken = await this.tokenService.refreshRefreshToken(
+      refreshToken,
+      refreshToken.accessToken,
+      getOneMonthLater().getTime(),
+    );
+
+    return {
+      accessToken: newAccessToken.token,
+      refreshToken: newRefreshToken.token,
+    };
   }
 }

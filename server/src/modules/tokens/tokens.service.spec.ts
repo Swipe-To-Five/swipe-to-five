@@ -1,3 +1,4 @@
+import { getOneMonthLater } from './../../utils/time.util';
 import { Account } from './../../models/account.model';
 import { RefreshToken } from './../../models/refresh_token.model';
 import { AccessToken } from './../../models/access_token.model';
@@ -18,6 +19,7 @@ const testAccessToken = {
   token: 'token',
   platform: 'platform',
   account: testAccount,
+  save: jest.fn(() => testAccessToken),
 };
 
 const testRefreshToken = {
@@ -137,5 +139,23 @@ describe('TokensService', () => {
 
     expect(mockResult).toEqual(testRefreshToken);
     expect(createSpy).toBeCalledTimes(1);
+  });
+
+  it('should refresh access tokens', async () => {
+    const mockResult = await service.refreshAccessToken(
+      testAccessToken as AccessToken,
+    );
+
+    expect(mockResult).toEqual(testAccessToken);
+  });
+
+  it('should refresh refresh tokens', async () => {
+    const mockResult = await service.refreshRefreshToken(
+      testRefreshToken as RefreshToken,
+      testAccessToken as AccessToken,
+      getOneMonthLater().getTime(),
+    );
+
+    expect(mockResult).toEqual(testRefreshToken);
   });
 });
