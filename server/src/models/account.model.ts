@@ -1,21 +1,10 @@
 import { CreateAccountDto } from './../dto/auth/create-account.dto';
 import { AccessToken } from './access_token.model';
-import {
-  Column,
-  DataType,
-  HasMany,
-  Model,
-  PrimaryKey,
-  Table,
-} from 'sequelize-typescript';
+import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
 import * as bcrypt from 'bcrypt';
 
 @Table({ tableName: 'accounts' })
 export class Account extends Model<Account> {
-  @PrimaryKey
-  @Column({ type: DataType.UUID })
-  public id: string;
-
   @Column({ unique: true, field: 'email_address' })
   public emailAddress: string;
 

@@ -4,7 +4,7 @@ import { AccountService } from './account.service';
 import * as bcrypt from 'bcrypt';
 import { AccountError } from '../../enum/account/account-error.enum';
 
-@Controller('account')
+@Controller('v1/account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 

@@ -109,6 +109,7 @@ export class TokensService {
 
     return await this.accessTokenRepository.create({
       account,
+      accountId: account.id,
       token: accessToken,
       platform,
     });
@@ -134,13 +135,14 @@ export class TokensService {
     const dummyRefreshToken = await this.refreshTokenRepository.create({
       token: 'dummy',
       accessToken: accessTokenModel,
+      accessTokenId: accessTokenModel.id,
     });
 
     const options: SignOptions = {
       ...BASE_OPTIONS,
       expiresIn,
       subject: String(accessTokenModel.account.id),
-      jwtid: dummyRefreshToken.id,
+      jwtid: String(dummyRefreshToken.id),
     };
 
     const refreshToken = await this.jwtService.signAsync({}, options);
