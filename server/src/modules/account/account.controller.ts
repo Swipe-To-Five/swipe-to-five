@@ -17,12 +17,21 @@ import { AccountError } from '../../enum/account/account-error.enum';
 import { LoggedInAccount } from './../../decorators/logged-in-account.decorator';
 import { Roles } from './../../decorators/roles.decorator';
 
+/**
+ * Controller Layer Implementation for Account.
+ */
 @Controller('v1/account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
+  /**
+   * Controller Implementation for account creation.
+   * @param createAccountDto DTO Object for account creation.
+   * @returns Account Model Object
+   */
   @Post()
   public async createAccount(@Body() createAccountDto: CreateAccountDto) {
+    // Check for account existence in the database.
     const checkAccount = await this.accountService.getAccount({
       where: {
         emailAddress: createAccountDto.emailAddress,
@@ -34,7 +43,10 @@ export class AccountController {
         message: AccountError.ACCOUNT_ALREADY_EXISTS,
       });
     } else {
+      // Hash the plaintext password.
       const hashedPassword = await bcrypt.hash(createAccountDto.password, 12);
+
+      // Save the new account in the database and return the object.
       return await this.accountService.createAccount({
         emailAddress: createAccountDto.emailAddress,
         password: hashedPassword,
@@ -43,6 +55,11 @@ export class AccountController {
     }
   }
 
+  /**
+   * Controller Implementation for fetching logged in user details.
+   * @param account Logged In User Details.
+   * @returns Logged In User Details.
+   */
   @Get()
   @Roles(RECRUITER, RECRUITEE)
   @UseGuards(JwtGuard, RolesGuard)
