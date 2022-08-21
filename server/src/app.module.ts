@@ -6,6 +6,7 @@ import { Account } from './models/account.model';
 import { RefreshToken } from './models/refresh_token.model';
 import { AccountModule } from './modules/account/account.module';
 import { AuthModule } from './modules/auth/auth.module';
+
 @Module({
   imports: [
     SequelizeModule.forRoot({
