@@ -8,6 +8,9 @@ export interface AccessTokenPayload {
   sub: number;
 }
 
+/**
+ * Strategy Implementation for verifying access tokens.
+ */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   public constructor(private readonly accountService: AccountService) {
@@ -21,9 +24,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  /**
+   * Validate token payload and return account.
+   * @param payload JWT Payload
+   * @returns Logged In Account.
+   */
   async validate(payload: AccessTokenPayload): Promise<Account> {
+    // Fetch the subject from the payload.
     const { sub: id } = payload;
 
+    // Fetch the corresponding account and check if it exists.
     const account = await this.accountService.getAccount({
       where: {
         id,
@@ -34,6 +44,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Unauthorized');
     }
 
+    // Return account.
     return account;
   }
 }
