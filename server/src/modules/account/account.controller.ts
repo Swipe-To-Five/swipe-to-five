@@ -1,3 +1,5 @@
+import { RolesGuard } from './../../guards/roles.guard';
+import { RECRUITER, RECRUITEE } from './../../constants/roles.constant';
 import { Account } from './../../models/account.model';
 import { JwtGuard } from './../../guards/jwt.guard';
 import { CreateAccountDto } from './../../dto/auth/create-account.dto';
@@ -13,6 +15,7 @@ import { AccountService } from './account.service';
 import * as bcrypt from 'bcrypt';
 import { AccountError } from '../../enum/account/account-error.enum';
 import { LoggedInAccount } from './../../decorators/logged-in-account.decorator';
+import { Roles } from './../../decorators/roles.decorator';
 
 @Controller('v1/account')
 export class AccountController {
@@ -41,7 +44,8 @@ export class AccountController {
   }
 
   @Get()
-  @UseGuards(JwtGuard)
+  @Roles(RECRUITER, RECRUITEE)
+  @UseGuards(JwtGuard, RolesGuard)
   public getAccount(@LoggedInAccount() account: Account): Account {
     return account;
   }
