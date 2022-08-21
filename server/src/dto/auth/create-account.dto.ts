@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsEmail } from 'class-validator';
+import { RECRUITEE, RECRUITER } from './../../constants/roles.constant';
+import { IsNotEmpty, IsEmail, IsIn } from 'class-validator';
 
 export class CreateAccountDto {
   @IsEmail()
@@ -7,4 +8,8 @@ export class CreateAccountDto {
 
   @IsNotEmpty()
   public password: string;
+
+  @IsNotEmpty()
+  @IsIn([RECRUITEE, RECRUITER])
+  public role: string;
 }
