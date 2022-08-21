@@ -1,3 +1,4 @@
+import { RECRUITEE } from './../../constants/roles.constant';
 import { BadRequestException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/sequelize';
 import { Test } from '@nestjs/testing';
@@ -47,6 +48,7 @@ describe('AccountController', () => {
       controller.createAccount({
         emailAddress: 'example@example.com',
         password: 'example',
+        role: RECRUITEE,
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -58,6 +60,7 @@ describe('AccountController', () => {
     const returnValue = await controller.createAccount({
       emailAddress: 'example@example.com',
       password: 'example',
+      role: RECRUITEE,
     });
 
     expect(findOneServiceSpy).toBeCalledTimes(1);

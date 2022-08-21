@@ -35,6 +35,7 @@ export class AccountController {
       return await this.accountService.createAccount({
         emailAddress: createAccountDto.emailAddress,
         password: hashedPassword,
+        role: createAccountDto.role,
       });
     }
   }
