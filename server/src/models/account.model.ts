@@ -1,3 +1,4 @@
+import { RECRUITEE, RECRUITER } from './../constants/roles.constant';
 import { CreateAccountDto } from './../dto/auth/create-account.dto';
 import { AccessToken } from './access_token.model';
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
@@ -10,6 +11,12 @@ export class Account extends Model<Account> {
 
   @Column({ type: DataType.TEXT, field: 'password' })
   public password: string;
+
+  @Column({
+    type: DataType.ENUM(RECRUITEE, RECRUITER),
+    defaultValue: RECRUITEE,
+  })
+  public role: string;
 
   @HasMany(() => AccessToken)
   public accessTokens: AccessToken[];
