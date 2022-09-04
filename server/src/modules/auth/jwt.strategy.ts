@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: '<SECRET KEY>',
       signOptions: {
-        expiresIn: '30s',
+        expiresIn: '15m',
       },
     });
   }
