@@ -1,6 +1,7 @@
 import { RECRUITEE } from './constants/roles.constants';
 import { CreateAccountDto } from './dtos/auth/create-account.dto';
-import { createNewAccount } from './services/auth.service';
+import { LoginAccountDto } from './dtos/auth/login-account.dto';
+import { createNewAccount, loginAccount } from './services/auth.service';
 
 const App = () => {
   return (
@@ -16,6 +17,15 @@ const App = () => {
         }}
       >
         Register
+      </button>
+      <button
+        onClick={async () => {
+          await loginAccount(
+            new LoginAccountDto('example@example.com', 'example', 'WEB')
+          );
+        }}
+      >
+        Login
       </button>
     </div>
   );
