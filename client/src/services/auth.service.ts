@@ -8,6 +8,7 @@ import {
 } from '../util/error-string.util';
 import { AxiosError } from 'axios';
 import { LoginAccountDto } from '../dtos/auth/login-account.dto';
+import { RefreshTokensDto } from '../dtos/auth/refresh-tokens.dto';
 
 /**
  * Service Implementation for account registration.
@@ -65,6 +66,51 @@ export const loginAccount = async (
     const response = await publicServer.post(
       'v1/auth/login',
       loginAccountDto.toJson()
+    );
+
+    // Fetching tokens from the response.
+    const { data } = response;
+    const { accessToken, refreshToken } = data;
+
+    // Saving tokens in the local storage.
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+  } catch (error) {
+    // Check if error type is AxiosError.
+    if (error instanceof AxiosError) {
+      // Fetch the error response from the server.
+      const errorResponse = error.response;
+
+      // Fetch the type of exception based on error status code.
+      const serverException = checkForException(errorResponse?.status!);
+
+      // If there is a server specific error, handle it.
+      if (serverException) {
+        // Fetch the human langauge from the server message.
+        const message = authErrorToString(errorResponse?.data['message']);
+
+        // Throw new error.
+        throw serverException(message);
+      }
+    }
+
+    // Else throw the error forward.
+    throw error;
+  }
+};
+
+/**
+ * Service Implementation for refreshing access token.
+ * @param refreshTokensDto DTO Implementation for refreshing access token.
+ */
+export const refreshTokens = async (
+  refreshTokensDto: RefreshTokensDto
+): Promise<void> => {
+  try {
+    // Send a request to the server for refreshing access and refresh tokens.
+    const response = await publicServer.post(
+      'v1/auth/refresh',
+      refreshTokensDto.toJson()
     );
 
     // Fetching tokens from the response.
