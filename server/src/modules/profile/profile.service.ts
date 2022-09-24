@@ -1,3 +1,4 @@
+import { UpdateRecruiterProfile } from './../../dto/profile/update-recruiter-profile.dto';
 import { UpdateRecruiteeProfile } from './../../dto/profile/update-recruitee-profile.dto';
 import { Account } from './../../models/account.model';
 import { Skill } from './../../models/skill.model';
@@ -90,6 +91,51 @@ export class ProfileService {
         accountId: account.id,
       },
       include: [this.skillRepository],
+    });
+  }
+
+  /**
+   * Service Implementation for updating recruiter profile.
+   * @param account Logged in account details
+   * @param updateRecruiterProfile DTO Implementation for updating recruiter profile.
+   * @returns Upserted Recruiter Profile
+   */
+  public async upsertRecruiterProfile(
+    account: Account,
+    updateRecruiterProfile: UpdateRecruiterProfile,
+  ): Promise<RecruiterProfile> {
+    // Checking if profile already exists.
+    const dbProfile = await this.recruiterProfileRepository.findOne({
+      where: {
+        accountId: account.id,
+      },
+    });
+
+    // If profile already exists, update it.
+    if (dbProfile)
+      await this.recruiterProfileRepository.update(
+        {
+          name: updateRecruiterProfile.name,
+          description: updateRecruiterProfile.description,
+          imageUrl: updateRecruiterProfile.imageUrl,
+        },
+        { where: { id: dbProfile.id }, returning: true },
+      );
+    // Else, create a new one.
+    else
+      await this.recruiterProfileRepository.create({
+        accountId: account.id,
+        account: account,
+        name: updateRecruiterProfile.name,
+        description: updateRecruiterProfile.description,
+        imageUrl: updateRecruiterProfile.imageUrl,
+      });
+
+    // Return the upserted profile.
+    return await this.recruiterProfileRepository.findOne({
+      where: {
+        accountId: account.id,
+      },
     });
   }
 }
