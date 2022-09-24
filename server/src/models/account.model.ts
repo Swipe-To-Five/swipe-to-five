@@ -1,8 +1,15 @@
 import { RECRUITEE, RECRUITER } from './../constants/roles.constant';
-import { CreateAccountDto } from './../dto/auth/create-account.dto';
 import { AccessToken } from './access_token.model';
-import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
-import * as bcrypt from 'bcrypt';
+import {
+  Column,
+  DataType,
+  HasMany,
+  HasOne,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { RecruiteeProfile } from './recruitee-profile.model';
+import { RecruiterProfile } from './recruiter-profile.model';
 
 @Table({ tableName: 'accounts' })
 export class Account extends Model<Account> {
@@ -21,14 +28,9 @@ export class Account extends Model<Account> {
   @HasMany(() => AccessToken)
   public accessTokens: AccessToken[];
 
-  public static async fromDto(
-    createAccountDto: CreateAccountDto,
-  ): Promise<Account> {
-    const account = new Account();
+  @HasOne(() => RecruiteeProfile)
+  public recruiteeProfile: RecruiteeProfile;
 
-    account.emailAddress = createAccountDto.emailAddress;
-    account.password = await bcrypt.hash(createAccountDto.password, 12);
-
-    return account;
-  }
+  @HasOne(() => RecruiterProfile)
+  public recruiterProfile: RecruiterProfile;
 }
