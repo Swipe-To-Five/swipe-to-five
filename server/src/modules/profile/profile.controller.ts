@@ -1,3 +1,5 @@
+import { RecruiterProfile } from './../../models/recruiter-profile.model';
+import { UpdateRecruiterProfile } from './../../dto/profile/update-recruiter-profile.dto';
 import { Account } from './../../models/account.model';
 import { UpdateRecruiteeProfile } from './../../dto/profile/update-recruitee-profile.dto';
 import { ProfileService } from './profile.service';
@@ -29,6 +31,25 @@ export class ProfileController {
     return await this.profileService.upsertRecruiteeProfile(
       account,
       updateRecruiteeProfile,
+    );
+  }
+
+  /**
+   * Controller Implementation for updating recruiter profile.
+   * @param account Logged In Account
+   * @param updateRecruiteeProfile DTO Implementation for updating recruiter profile.
+   * @returns Upserted recruiter profile.
+   */
+  @Post('recruiter')
+  @Roles(RECRUITER)
+  @UseGuards(JwtGuard, RolesGuard)
+  public async updateRecruiterProfile(
+    @LoggedInAccount() account: Account,
+    @Body() updateRecruiterProfile: UpdateRecruiterProfile,
+  ): Promise<RecruiterProfile> {
+    return await this.profileService.upsertRecruiterProfile(
+      account,
+      updateRecruiterProfile,
     );
   }
 }
