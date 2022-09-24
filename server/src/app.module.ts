@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { SkillRecruiteeProfile } from './models/skill-recruitee-profile.model';
 import { Skill } from './models/skill.model';
 import { RecruiteeProfile } from './models/recruitee-profile.model';
+import { RecruiterProfile } from './models/recruiter-profile.model';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { RecruiteeProfile } from './models/recruitee-profile.model';
         RecruiteeProfile,
         Skill,
         SkillRecruiteeProfile,
+        RecruiterProfile,
       ],
       synchronize: true,
       autoLoadModels: true,

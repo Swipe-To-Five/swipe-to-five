@@ -9,6 +9,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { RecruiteeProfile } from './recruitee-profile.model';
+import { RecruiterProfile } from './recruiter-profile.model';
 
 @Table({ tableName: 'accounts' })
 export class Account extends Model<Account> {
@@ -29,4 +30,7 @@ export class Account extends Model<Account> {
 
   @HasOne(() => RecruiteeProfile)
   public recruiteeProfile: RecruiteeProfile;
+
+  @HasOne(() => RecruiterProfile)
+  public recruiterProfile: RecruiterProfile;
 }
