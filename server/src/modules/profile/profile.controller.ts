@@ -1,3 +1,4 @@
+import { AuthError } from './../../enum/auth/auth-error.enum';
 import { RecruiterProfile } from './../../models/recruiter-profile.model';
 import { UpdateRecruiterProfile } from './../../dto/profile/update-recruiter-profile.dto';
 import { Account } from './../../models/account.model';
@@ -7,13 +8,42 @@ import { RecruiteeProfile } from './../../models/recruitee-profile.model';
 import { RolesGuard } from './../../guards/roles.guard';
 import { RECRUITER, RECRUITEE } from './../../constants/roles.constant';
 import { JwtGuard } from './../../guards/jwt.guard';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { Roles } from '../../decorators/roles.decorator';
 import { LoggedInAccount } from '../../decorators/logged-in-account.decorator';
 
 @Controller('v1/profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
+
+  /**
+   * Controller Implementation for fetching recruitee / recruiter profile.
+   * @param account Logged In Account.
+   * @returns Corresponding Profile.
+   */
+  @Get()
+  @Roles(RECRUITEE, RECRUITEE)
+  @UseGuards(JwtGuard, RolesGuard)
+  public async fetchProfile(
+    @LoggedInAccount() account: Account,
+  ): Promise<RecruiteeProfile | RecruiterProfile> {
+    const profile = await this.profileService.fetchProfile(account);
+
+    if (profile === null) {
+      throw new ForbiddenException({
+        error: AuthError.FORBIDDEN,
+      });
+    } else {
+      return profile;
+    }
+  }
 
   /**
    * Controller Implementation for updating recruitee profile.
