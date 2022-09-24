@@ -7,6 +7,11 @@ export class Skill extends Model<Skill> {
   @Column
   public skill: string;
 
-  @BelongsToMany(() => RecruiteeProfile, () => SkillRecruiteeProfile)
+  @BelongsToMany(
+    () => RecruiteeProfile,
+    () => SkillRecruiteeProfile,
+    'skillId',
+    'recruiteeProfileId',
+  )
   recruiteeProfiles: RecruiteeProfile[];
 }

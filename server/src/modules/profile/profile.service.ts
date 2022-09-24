@@ -37,8 +37,7 @@ export class ProfileService {
             skill: skill.toUpperCase(),
           },
         });
-
-        if (created) return dbSkill;
+        return dbSkill;
       }),
     );
 
@@ -50,28 +49,47 @@ export class ProfileService {
     });
 
     // If profile already exists, update it.
-    if (dbProfile)
-      await this.recruiteeProfileRepository.update(
-        {
-          ...updateRecruiteeProfile,
-          skills: dbSkills,
-        },
-        { where: { id: dbProfile.id } },
-      );
+    if (dbProfile) {
+      const [_, [updatedProfile]] =
+        await this.recruiteeProfileRepository.update(
+          {
+            name: updateRecruiteeProfile.name,
+            description: updateRecruiteeProfile.description,
+            imageUrl: updateRecruiteeProfile.imageUrl,
+            resumeUrl: updateRecruiteeProfile.resumeUrl,
+            skills: dbSkills,
+          },
+          { where: { id: dbProfile.id }, returning: true },
+        );
+
+      // Update skill relations on the profile.
+      await updatedProfile.$set('skills', dbSkills, {
+        through: 'skills_recruitee_profiles',
+      });
+    }
     // Else, create a new one.
-    else
-      await this.recruiteeProfileRepository.create({
+    else {
+      const newProfile = await this.recruiteeProfileRepository.create({
         accountId: account.id,
         account: account,
-        ...updateRecruiteeProfile,
-        skills: dbSkills,
+        name: updateRecruiteeProfile.name,
+        description: updateRecruiteeProfile.description,
+        imageUrl: updateRecruiteeProfile.imageUrl,
+        resumeUrl: updateRecruiteeProfile.resumeUrl,
       });
+
+      // Update skill relations on the profile.
+      await newProfile.$set('skills', dbSkills, {
+        through: 'skills_recruitee_profiles',
+      });
+    }
 
     // Return the upserted profile.
     return await this.recruiteeProfileRepository.findOne({
       where: {
         accountId: account.id,
       },
+      include: [this.skillRepository],
     });
   }
 }

@@ -25,7 +25,12 @@ export class RecruiteeProfile extends Model<RecruiteeProfile> {
   @Column(DataType.TEXT)
   public description: string;
 
-  @BelongsToMany(() => Skill, () => SkillRecruiteeProfile)
+  @BelongsToMany(
+    () => Skill,
+    () => SkillRecruiteeProfile,
+    'recruiteeProfileId',
+    'skillId',
+  )
   public skills: Skill[];
 
   @BelongsTo(() => Account)
