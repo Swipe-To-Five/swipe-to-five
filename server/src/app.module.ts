@@ -6,6 +6,9 @@ import { Account } from './models/account.model';
 import { RefreshToken } from './models/refresh_token.model';
 import { AccountModule } from './modules/account/account.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { SkillRecruiteeProfile } from './models/skill-recruitee-profile.model';
+import { Skill } from './models/skill.model';
+import { RecruiteeProfile } from './models/recruitee-profile.model';
 
 @Module({
   imports: [
@@ -16,7 +19,14 @@ import { AuthModule } from './modules/auth/auth.module';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      models: [Account, AccessToken, RefreshToken],
+      models: [
+        Account,
+        AccessToken,
+        RefreshToken,
+        RecruiteeProfile,
+        Skill,
+        SkillRecruiteeProfile,
+      ],
       synchronize: true,
       autoLoadModels: true,
     }),
