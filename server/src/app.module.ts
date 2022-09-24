@@ -10,6 +10,7 @@ import { SkillRecruiteeProfile } from './models/skill-recruitee-profile.model';
 import { Skill } from './models/skill.model';
 import { RecruiteeProfile } from './models/recruitee-profile.model';
 import { RecruiterProfile } from './models/recruiter-profile.model';
+import { ProfileModule } from './modules/profile/profile.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { RecruiterProfile } from './models/recruiter-profile.model';
     AccountModule,
     TokensModule,
     AuthModule,
+    ProfileModule,
   ],
 })
 export class AppModule {}
